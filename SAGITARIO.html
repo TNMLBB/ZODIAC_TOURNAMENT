@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZODIAC TOURNAMENT SAGITARIO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        /* --- QUINTA PALETA DE COLORES (DEEP BLUE/MAGENTA - Basada en el Logo) --- */
+        :root{
+            /* Base: Deep Blue-Black #0D0D1A | Primary: Deep Electric Blue #0000B3 | Secondary: Vibrant Magenta #FF00FF */
+            
+            --primary-accent: #0000B3;  /* Deep Electric Blue (Usado para texto, bordes, elementos principales) */
+            --secondary-accent: #FF00FF; /* Vibrant Magenta (Usado para bloques, botones de acción, foco) */
+            --base-dark: #0D0D1A;        /* Deep Blue-Black (Fondo de base) */
+            
+            /* Variaciones derivadas */
+            --tertiary-mauve-base: #FF77FF; /* Un magenta más suave */
+            --alert-neon-red: #ff4f4f;      /* Mantenemos el rojo para alertas */
+            --text-light: #ffffff;          /* Blanco puro */
+            --text-dark: #1F2937;           /* Gris oscuro para contraste en acentos claros */
+            
+            /* Translucencias */
+            --translucent-dark-50: rgba(13, 13, 26, 0.8); 
+            --translucent-dark-70: rgba(13, 13, 26, 0.95); /* Más opaco para legibilidad sobre el video */
+            --translucent-secondary-70: rgba(255, 0, 255, 0.2); /* Tinte magenta suave */
+            --translucent-primary-70: rgba(0, 0, 179, 0.3); /* Tinte deep blue suave (basado en #0000B3) */
+        }
+
+        #video-background{position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:hidden;z-index:-100;pointer-events:none;}
+        #video-background::after{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0, 0, 34, 0.6);z-index:-99;} /* Overlay oscuro azulado */
+        #background-video{min-width:100%;min-height:100%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);object-fit:cover;}
+        
+        .floating-logo-container{position:fixed;bottom:20px;z-index:100;transition:all .3s ease;width:80px;height:auto;border-radius:.5rem;}
+        .floating-logo-container img{width:100%;height:auto;display:block;}
+        #tnml-logo-container{right:20px;filter:grayscale(100%) brightness(.7);}
+        #tnml-logo-container:hover{filter:grayscale(0%) brightness(1) drop-shadow(0 0 10px var(--text-light));opacity:1;transform:scale(1.05);}
+        #sponsor-logo-container{left:20px;filter:none;opacity:.85;}
+        #sponsor-logo-container:hover{filter:drop-shadow(0 0 10px var(--secondary-accent));opacity:1;transform:scale(1.05);}
+        
+        body{font-family:'Inter',sans-serif;background-color:var(--base-dark);color:#e2e8f0;overflow-x:hidden;}
+        
+        /* Header, Content and General Styles */
+        /* Ajuste de botones: Cyan/Magenta tienen diferentes textos */
+        .accordion-header{background-color:var(--secondary-accent);color:var(--text-light); text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow:0 4px 6px -1px rgba(0,0,0,.6);border:2px solid var(--secondary-accent);transition:all 0.3s ease; font-weight: 700;}
+        .accordion-header:hover{filter:brightness(1.1);}
+        /* El acordeón activo usa el Primary Accent (Deep Blue) */
+        .accordion-header.active{background-color:var(--primary-accent);color:var(--text-light);text-shadow: 0 1px 2px rgba(0,0,0,0.5);border-bottom-left-radius:0;border-bottom-right-radius:0;border-color:var(--primary-accent);}
+        .accordion-content-body{background-color:var(--translucent-dark-70);border:1px solid var(--primary-accent);border-top:none;border-bottom-left-radius:0.75rem;border-bottom-right-radius:0.75rem;}
+        
+        .icon-rotate{transition:transform 0.3s ease;} .icon-rotate.rotated{transform:rotate(180deg);}
+        .stat-card{background-color:var(--translucent-dark-50);border-radius:.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.6),0 4px 6px -2px rgba(0,0,0,.4);padding:1.5rem;display:flex;flex-direction:column;justify-content:center;align-items:center; border: 1px solid rgba(0, 0, 179, 0.2);}
+        
+        .bg-gray-800,.bg-gray-900{background-color:var(--translucent-dark-50)!important;}
+        .chart-container{position:relative;width:100%;max-width:600px;margin-left:auto;margin-right:auto;height:300px;max-height:400px;}
+        @media(min-width:768px){.chart-container{height:350px;}}
+        .bg-red-900\/50{background-color:rgba(255, 79, 79, 0.3);border-color:var(--alert-neon-red);}
+        
+        /* Color Utility Classes */
+        .text-primary-accent{color:var(--primary-accent);} 
+        .text-secondary-accent{color:var(--secondary-accent);}
+        /* Outline ajustado para el fondo Deep Blue-Black */
+        .text-outline-dark{text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;}
+        
+        .denuncia-btn{background-color:var(--alert-neon-red);color:var(--text-light);box-shadow:0 0 10px var(--alert-neon-red);transition:all .3s ease;font-weight:700;}
+        .denuncia-btn:hover{box-shadow:0 0 20px var(--alert-neon-red);transform:scale(1.05);background-color:#ff3333;}
+        
+        /* Botones Principales (Deep Blue - Texto Light) */
+        .btn-action-primary{background-color:var(--primary-accent);box-shadow:0 0 15px var(--primary-accent);color:var(--text-light);text-shadow: 0 1px 2px rgba(0,0,0,0.5);transition:all .3s ease;transform:scale(1.0); font-weight: 700;}
+        .btn-action-primary:hover{box-shadow:0 0 25px var(--primary-accent),0 0 3px var(--text-light);transform:scale(1.05);}
+        
+        /* Botones Secundarios (Vibrant Magenta - Texto Light) */
+        .btn-action-secondary{background-color:var(--secondary-accent);box-shadow:0 0 15px var(--secondary-accent);color:var(--text-light);transition:all .3s ease;transform:scale(1.0); font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.5);}
+        .btn-action-secondary:hover{box-shadow:0 0 25px var(--secondary-accent),0 0 3px var(--text-light);transform:scale(1.05);}
+        
+        .step-card{background-color:var(--translucent-primary-70);border:2px solid var(--primary-accent);transition:border-color .3s ease; color: var(--text-light);}
+        .step-card.primary-step{border-color:var(--secondary-accent);}
+        .header-info-card{background-color:var(--translucent-dark-70);border-radius:.75rem;padding:1.5rem 1.5rem;margin-top:1.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.6),0 44px 6px -2px rgba(0,0,0,.4);border:1px solid var(--primary-accent);}
+        
+        .interactive-link{transition:all .2s ease-in-out;display:block;text-decoration:none;}
+        .interactive-link:hover{color:var(--text-light);text-shadow:0 0 5px var(--primary-accent);transform:scale(1.01);}
+        
+        .music-btn{background-color:var(--secondary-accent);color:var(--text-light);box-shadow:0 0 10px var(--secondary-accent);transition:all .3s ease;font-weight:700;}
+        .music-btn.off{background-color:var(--alert-neon-red);color:var(--text-light);box-shadow:0 0 10px var(--alert-neon-red);}
+        .music-btn:hover{filter:brightness(1.2);}
+        
+        .calendar-btn{background-color:var(--primary-accent);color:var(--text-light);box-shadow:0 0 10px var(--primary-accent);transition:all .3s ease;font-weight:700;}
+        .calendar-btn:hover{box-shadow:0 0 20px var(--primary-accent),0 0 5px var(--text-light);transform:scale(1.03);}
+        
+        .mandatory-alert{background-color:rgba(0, 0, 179, 0.2);border:2px solid var(--primary-accent);color:var(--text-light);padding:1.25rem;border-radius:.5rem;text-align:center;box-shadow:0 0 15px rgba(0, 0, 179, 0.5);}
+        .mandatory-alert strong{font-size:1.5rem;display:block;margin-bottom:.5rem;} .mandatory-alert p{font-size:1.125rem;font-weight:600;}
+        
+        .tiktok-live-alert{background-color:var(--translucent-secondary-70);border:2px solid var(--secondary-accent);color:var(--text-light);padding:1.5rem;border-radius:1rem;text-align:center;box-shadow:0 0 20px rgba(255, 0, 255, 0.4);animation:pulse-border 1.5s infinite alternate;}
+        @keyframes pulse-border{from{border-color:var(--secondary-accent);box-shadow:0 0 15px var(--secondary-accent);}to{border-color:var(--primary-accent);box-shadow:0 0 25px var(--primary-accent);}}
+        .tiktok-live-alert strong{font-size:1.875rem;display:block;margin-bottom:.5rem;color:var(--primary-accent);}
+        
+        .grave-offense{background-color:var(--translucent-secondary-70);border:2px solid var(--secondary-accent);box-shadow:0 0 10px var(--secondary-accent);}
+        
+        .organizacion-btn{background-color:var(--primary-accent);color:var(--text-light);box-shadow:0 0 15px var(--primary-accent);transition:all 0.3s ease;font-weight:700;}
+        .organizacion-btn:hover{box-shadow:0 0 25px var(--primary-accent),0 0 5px var(--text-light);transform:scale(1.05);}
+        
+        .reclamo-panel{background-color:var(--translucent-secondary-70);border-radius:.75rem;padding:1.5rem;margin-top:1.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.6);border:1px solid var(--secondary-accent);}
+        .info-panel{background-color:var(--translucent-primary-70);border:2px solid var(--primary-accent);padding:1.5rem;border-radius:.75rem;box-shadow:0 0 10px rgba(0, 0, 179, 0.3);margin-top:1.5rem;}
+        .prohibido-offense{background-color:rgba(255, 79, 79, 0.2);border:2px solid var(--alert-neon-red);box-shadow:0 0 10px var(--alert-neon-red);}
+        
+        /* Ajustes para textos específicos */
+        .text-gray-300 { color: #e2e8f0 !important; }
+        .text-gray-400 { color: #cbd5e1 !important; }
+        .text-gray-200 { color: #f1f5f9 !important; }
+        .bg-gray-700 { background-color: rgba(0, 0, 0, 0.8) !important; }
+    </style>
+</head>
+<body class="text-gray-100">
+    <div id="video-background"><video id="background-video" autoplay loop muted playsinline><source src="https://i.imgur.com/z7jd5Vo.mp4" type="video/mp4">Tu navegador no soporta la etiqueta de video HTML5.</video></div>
+    <a href="https://www.tiktok.com/@torneosnocturnos?_t=ZM-90xkaWgv1YW&_r=1" target="_blank" class="floating-logo-container" id="tnml-logo-container"><img src="https://i.imgur.com/KFK0RR9.png" alt="TNML Logo"></a>
+    <!-- Patrocinador DIGISTAR -->
+    <a href="#" target="_white" class="floating-logo-container" id="sponsor-logo-container"><img src="https://i.imgur.com/nRdITzE.png" alt="DIGISTAR Logo"></a>
+    <div class="container mx-auto max-w-5xl p-4 md:p-8 relative z-10">
+        <header class="text-center mb-6">
+            <!-- La imagen de título se mantiene aquí con la URL que habías modificado manualmente -->
+            <img src="https://i.imgur.com/5ScdMKN.png" alt="ZODIAC TOURNAMENT SAGITARIO" class="mx-auto w-full max-w-lg md:max-w-xl h-auto mb-2">
+            <div class="header-info-card mx-auto max-w-lg">
+                <p class="text-xl md:text-2xl font-extrabold text-secondary-accent mt-1 text-outline-dark">ZODIAC TOURNAMENT SAGITARIO</p>
+                <p class="text-lg md:text-xl font-semibold text-primary-accent mt-1">Organizado por Torneos Nocturnos de Mobile Legends (TNML)</p>
+                <a href="https://www.tiktok.com/@diabolos.gaming?_r=1&_t=ZM-914V1OER2tM" target="_blank" class="text-base md:text-lg font-medium text-secondary-accent mt-1 interactive-link">Casteado por <span class="font-bold underline text-primary-accent">DIABOLOS GAMING</span></a>
+                <div class="mandatory-alert mt-4 mb-4"><strong class="flex items-center justify-center">ATENCIÓN JUGADORES</strong><p>Es <span class="font-extrabold text-primary-accent">OBLIGATORIO</span> leer <span class="underline">todas las secciones</span>. No leer las bases <span class="font-extrabold text-alert-neon-red">NO exime</span> a ningún Equipo de las sanciones por incumplimiento.</p></div>
+                <div class="mt-4"><button id="music-toggle-btn" class="music-btn py-2 px-4 rounded-full text-sm font-bold transition-all duration-300">MÚSICA ON</button></div>
+            </div>
+        </header>
+        <main class="space-y-4">
+            <!-- SECCIÓN 1: BIENVENIDA -->
+            <div class="accordion-item" id="accordion-inicio">
+                <button data-target="inicio" class="accordion-header active flex justify-between items-center w-full p-4 rounded-t-xl text-left font-bold text-xl transition duration-300"><span>1. BIENVENIDA Y CRONOGRAMA OFICIAL</span><svg id="icon-inicio" class="w-6 h-6 icon-rotate rotated" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                <div id="content-inicio" class="accordion-content overflow-hidden transition-all duration-500 ease-in-out max-h-screen">
+                    <div class="accordion-content-body p-6 md:p-8">
+                        <h2 class="text-3xl font-bold text-primary-accent mb-4">¡Bienvenidos al Torneo!</h2>
+                        <p class="text-lg text-gray-300 mb-6">Esta es la guía interactiva oficial del ZODIAC TOURNAMENT SAGITARIO. Revisa los datos clave a continuación y navega por las pestañas para conocer todos los detalles.</p>
+                        <div class="text-center mb-8">
+                            <h3 class="2xl font-bold text-primary-accent mb-3 uppercase tracking-wider">PREMIO AL EQUIPO CAMPEÓN</h3>
+                            <div class="stat-card border-l-4 mx-auto max-w-sm" style="border-left-color: var(--secondary-accent);">
+                                <!-- Imagen de premio placeholder -->
+                                <img src="https://i.imgur.com/ZeVgTgo.png" alt="Premio 5 Pases Semanales DIGISTAR" class="w-full h-auto rounded-lg mb-4 border-2 border-primary-accent shadow-lg">
+                                <span class="text-lg font-bold text-secondary-accent mb-3 block">El Equipo que se corone como Campeón recibirá:</span>
+                                <ul class="list-none text-left space-y-2 text-gray-200 w-full max-w-[80%] mx-auto">
+                                    <li class="flex items-start"><span class="text-primary-accent mr-2 mt-1">🎁</span><span><span class="font-bold text-primary-accent">5 Pases Semanales</span> (uno para cada jugador titular), cortesía de <span class="font-extrabold text-secondary-accent">DIGISTAR</span>.</span></li>
+                                    <li class="flex items-start"><span class="text-primary-accent mr-2 mt-1">🏆</span><span><span class="font-bold text-primary-accent">Trofeo Digital</span> identificado con los nombres de los <span class="font-bold text-secondary-accent">Campeones</span> y publicado en el Salón de la Fama de nuestro Instagram.</span></li>
+                                </ul>
+                            </div>
+                            <a href="https://www.instagram.com/s/aGlnaGxpZ2h0OjE4MDc3NTg2NDc1OTM1MDA5?story_media_id=3761792500475104209_78075600784&igsh=MWtwZjI5OXZhd3Fmcg%3D%3D" target="_blank" class="mt-6 inline-flex items-center justify-center px-6 py-3 text-sm md:text-base font-bold uppercase rounded-full transition-all duration-300 transform hover:scale-105 shadow-md btn-action-secondary">SALÓN DE LA FAMA<img src="https://i.imgur.com/zkSyi27.png" alt="Trofeo Icono" class="w-5 h-5 ml-2"></a>
+                        </div>
+                        <div class="mb-10 p-6 rounded-lg shadow-2xl" style="background-color: var(--translucent-secondary-70);">
+                            <h3 class="2xl font-bold text-primary-accent mb-4 text-center" style="text-shadow: 0 0 5px var(--primary-accent);">CRONOGRAMA OFICIAL DEL TORNEO</h3>
+                            <div class="grid place-items-center">
+                                <div class="p-6 rounded-lg border-2 w-full max-w-md text-center" style="border-color: var(--primary-accent); background-color: var(--translucent-dark-70);">
+                                    <span class="block text-3xl font-extrabold text-primary-accent mb-2">VIERNES 5 DIC 2025</span>
+                                    <span class="block text-xl font-bold text-secondary-accent mb-3">8:00 PM Vzla</span>
+                                    <p class="text-gray-200 font-semibold">Rondas a Jugar:</p>
+                                    <ul class="list-none text-base text-gray-300 mt-1">
+                                        <li class="flex items-start"><span class="text-primary-accent mr-2 mt-1">▶</span><span><span class="font-bold">Primera Ronda</span> (<span class="font-bold text-primary-accent">Bo1</span> - 16 Equipos)</span></li>
+                                        <li class="flex items-start"><span class="text-primary-accent mr-2 mt-1">▶</span><span><span class="font-bold">Cuartos de Final</span> (<span class="font-bold text-primary-accent">Bo1</span> - 8 Equipos)</span></li>
+                                        <li class="flex items-start"><span class="text-secondary-accent mr-2 mt-1">▶</span><span><span class="font-bold text-secondary-accent">Semifinales</span> (<span class="font-bold text-secondary-accent">Bo1</span> - 4 Equipos)</span></li>
+                                        <li class="flex items-start"><span class="text-alert-neon-red mr-2 mt-1">▶</span><span><span class="font-bold text-alert-neon-red">Gran Final</span> (<span class="font-bold text-alert-neon-red">Bo3</span> - 2 Equipos)</span></li>
+                                    </ul>
+                                    <a id="calendar-link" href="#" target="_blank" class="mt-6 inline-flex items-center justify-center calendar-btn py-3 px-6 rounded-full text-base uppercase"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M7 14h.01M17 14h.01M12 14h.01M7 17h.01M12 17h.01M17 17h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>AGENDAR EN CALENDARIO</a>
+                                </div>
+                            </div>
+                            <div class="mt-6 p-4 rounded-lg border border-primary-accent text-left w-full max-w-lg" style="background-color: var(--translucent-dark-70);">
+                                <h4 class="text-xl font-bold text-primary-accent mb-2 flex items-center"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.228A9 9 0 0121 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.805A9.959 9.959 0 012 12C2 7.582 6.03 4 11 4s9 3.582 9 8z"></path></svg>Transparencia en el Emparejamiento</h4>
+                                <p class="text-gray-400 text-sm">El emparejamiento para la Primera Ronda se realiza mediante un prompt a nuestro asistente de IA (Gemini) para obtener una organización aleatoria. Esta solicitud a Gemini se <span class="font-bold text-secondary-accent">graba y se postea</span> para asegurar la transparencia total del proceso aleatorio.</p>
+                            </div>
+                        </div>
+                        <div class="info-panel mb-6">
+                            <h3 class="2xl font-bold text-secondary-accent mb-3 border-b pb-2 border-primary-accent">SOBRE EL ZODIAC TOURNAMENT</h3>
+                            <p class="text-lg text-gray-300 mb-3">Este <span class="font-bold text-primary-accent">ZODIAC TOURNAMENT SAGITARIO</span> es un evento <span class="font-extrabold text-primary-accent">periódico</span> que se organiza durante la temporada de cada signo zodiacal. El objetivo es celebrar el espíritu competitivo de la comunidad Mobile Legends.</p>
+                            <p class="text-gray-400 text-sm"><span class="font-bold text-secondary-accent">Próximos Eventos:</span> TNML seguirá organizando torneos con diferentes temáticas y formatos. ¡Síguenos para no perderte el próximo!</p>
+                        </div>
+                        <div class="tiktok-live-alert mt-8 mb-10">
+                            <strong class="flex items-center justify-center">¡SEMIFINALES Y GRAN FINAL EN VIVO!</strong>
+                            <p class="text-xl font-semibold text-gray-200 mb-4">Transmitiremos <span class="font-extrabold text-primary-accent">dos partidos de Semifinal (Bo1)</span> y el enfrentamiento definitivo <span class="font-extrabold text-alert-neon-red">(Gran Final Bo3)</span> en nuestra cuenta oficial de TikTok.</p>
+                            <a href="https://www.tiktok.com/@torneosnocturnos?_t=ZM-90xkaWgv1YW&_r=1" target="_blank" class="inline-flex items-center justify-center px-8 py-3 text-lg font-bold uppercase rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl" style="background-color: var(--primary-accent); color: var(--text-light); box-shadow: 0 0 15px var(--primary-accent);">VER LA TRANSMISIÓN EN TIKTOK</a>
+                        </div>
+                        <h3 class="2xl font-bold text-primary-accent mb-4 border-t pt-4 border-gray-700">Progresión del Torneo</h3>
+                        <p class="text-gray-300 mb-4">El torneo se desarrollará en un único día con formato de eliminación simple (Bo1, excepto la Gran Final que es Bo3). La gráfica a continuación muestra cómo avanzarán los 16 Equipos hasta encontrar al Equipo Campeón.</p>
+                        <div class="chart-container w-full max-w-2xl mx-auto h-80 md:h-96 relative"><canvas id="bracketChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+            <!-- SECCIÓN 2: INSCRIPCIÓN -->
+            <div class="accordion-item" id="accordion-inscripcion">
+                <button data-target="inscripcion" class="accordion-header flex justify-between items-center w-full p-4 rounded-xl text-left font-bold text-xl transition duration-300"><span>2. PROCESO Y DETALLES DE INSCRIPCIÓN</span><svg id="icon-inscripcion" class="w-6 h-6 icon-rotate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                <div id="content-inscripcion" class="accordion-content overflow-hidden transition-all duration-500 ease-in-out max-h-0">
+                    <div class="accordion-content-body p-6 md:p-8">
+                        <h2 class="text-3xl font-bold text-primary-accent mb-4">Proceso de Inscripción</h2>
+                        <p class="text-lg text-gray-300 mb-6">La inscripción es para <span class="font-bold text-secondary-accent">Equipos de 5 a 7 jugadores</span> (5 Titulares + 2 Suplentes opcionales). Los cupos son limitados a 16 Equipos.</p>
+                        <div class="grid md:grid-cols-1 gap-8 mb-10 place-items-center">
+                            <div class="step-card primary-step p-6 rounded-xl shadow-2xl flex flex-col items-center text-center max-w-md w-full">
+                                <h3 class="text-2xl font-bold text-primary-accent mb-3">Registra tu Equipo</h3>
+                                <p class="text-gray-300 mb-4">Rellena este formulario para inscribir a tu Equipo en el <span class="font-bold text-secondary-accent">ZODIAC TOURNAMENT SAGITARIO</span>. Los cupos son limitados a 16 equipos.</p>
+                                <div class="text-xs p-2 rounded-lg text-gray-400 font-medium w-full mt-2" style="background-color: var(--translucent-dark-50);"><span class="font-bold text-primary-accent">Nota:</span> Una vez que se agoten los cupos <span class="font-bold text-alert-neon-red">no podrán registrarse</span>.</div>
+                                <a href="https://forms.gle/nmP5qa5MuB8af8sH8" target="_blank" class="inline-flex items-center justify-center px-6 py-3 text-sm md:text-base font-bold uppercase rounded-xl btn-action-primary w-full mt-auto">REGISTRO DE EQUIPOS<svg class="w-8 h-8 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg></a>
+                            </div>
+                        </div>
+                        <div class="info-panel mb-8">
+                            <h3 class="2xl font-bold text-secondary-accent mb-3 border-b pb-2 border-primary-accent">GRUPO DE WHATSAPP Y COSTO</h3>
+                            <ul class="list-none space-y-4 text-gray-300">
+                                <li><strong class="text-secondary-accent">Grupo de WhatsApp:</strong> Tras el registro, serán añadidos a un grupo <span class="font-bold">provisional</span>. En este grupo, <span class="font-bold">sólo el STAFF y PATROCINANTES pueden escribir</span>. Los Equipos eliminados serán removidos del grupo a medida que avance el torneo.</li>
+                                <li><strong class="text-secondary-accent">Costo de Inscripción:</strong> Este evento es completamente <span class="font-extrabold text-primary-accent">GRATUITO</span>. No tiene costo de inscripción.</li>
+                                <li><strong class="text-secondary-accent">Cupos y Oportunidad:</strong> <span class="font-bold text-alert-neon-red">No se guardan cupos</span>. Los cupos se agotan conforme el registro avanza. Se recomienda inscribirse oportunamente para asegurar su participación.</li>
+                            </ul>
+                        </div>
+                        <h3 class="text-3xl font-bold text-primary-accent mb-6 border-t pt-6 border-gray-700">Detalles del Equipo</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-gray-900 p-6 rounded-lg border border-gray-700">
+                                <h3 class="text-2xl font-semibold text-primary-accent mb-3">Condiciones para Participar</h3>
+                                <ul class="list-disc list-inside space-y-2 text-gray-300">
+                                    <li><span class="font-bold">Restricciones:</span> No hay límites de edad o ubicación.</li>
+                                    <li><span class="font-bold">Composición:</span> El equipo debe tener <span class="font-bold text-primary-accent">5 jugadores titulares</span>. Puede registrar hasta <span class="font-bold text-primary-accent">2 suplentes opcionales</span> (máximo 7 jugadores).</li>
+                                    <li><span class="font-bold">Intercambio:</span> Los suplentes solo pueden ser usados <span class="font-bold text-secondary-accent">entre partidas</span> (siempre respetando la lista de 7 jugadores registrados).</li>
+                                    <li><span class="font-bold">Pertenencia:</span> Los jugadores <span class="font-bold text-secondary-accent">no tienen que pertenecer</span> al mismo escuadrón. Se acepta cualquier combinación de jugadores.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-900 p-6 rounded-lg border border-gray-700">
+                                <h3 class="2xl font-semibold text-primary-accent mb-3">Datos de Registro</h3>
+                                <p class="text-gray-300 mb-3">Para el registro, el Equipo deberá indicar la siguiente información de cada uno de sus integrantes (titulares y suplentes):</p>
+                                <ol class="list-decimal list-inside space-y-2 font-medium text-gray-300">
+                                    <li><span class="font-bold text-secondary-accent">Nombre y Apellido</span> del Jugador</li>
+                                    <li><span class="font-bold text-secondary-accent">Nickname</span> del Jugador (No se requiere siglas)</li>
+                                    <li><span class="font-bold text-secondary-accent">Whatsapp</span> del Jugador</li>
+                                    <li><span class="font-bold text-secondary-accent">ID de Jugador</span> del Jugador</li>
+                                </ol>
+                                <div class="mt-4 p-3 bg-red-900/50 border rounded-lg" style="border-color: var(--alert-neon-red); color: var(--text-light);">
+                                    <p class="font-bold text-lg">¡Atención!</p>
+                                    <p>El <span class="font-bold text-primary-accent">Nickname</span> registrado no podrá ser modificado durante el torneo. Jugar con un nick diferente se considera <span class="font-bold">suplantación</span>.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SECCIÓN 3: REGLAS -->
+            <div class="accordion-item" id="accordion-partida">
+                <button data-target="partida" class="accordion-header flex justify-between items-center w-full p-4 rounded-xl text-left font-bold text-xl transition duration-300"><span>3. REGLAS DE PARTIDA Y FORMATO</span><svg id="icon-partida" class="w-6 h-6 icon-rotate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                <div id="content-partida" class="accordion-content overflow-hidden transition-all duration-500 ease-in-out max-h-0">
+                    <div class="accordion-content-body p-6 md:p-8">
+                        <h2 class="text-3xl font-bold text-primary-accent mb-4">Reglas</h2>
+                        <p class="text-lg text-gray-300 mb-6">Estas son las reglas que se aplican antes, durante y después de cada enfrentamiento. Es responsabilidad de los Equipos conocerlas.</p>
+                        <div class="space-y-6">
+                            <div>
+                                <h3 class="2xl font-semibold text-primary-accent mb-3 border-b-2 border-gray-700 pb-2">Antes de la Partida</h3>
+                                <ul class="list-none space-y-4">
+                                    <li class="flex items-start gap-3 p-3 bg-red-900/50 rounded-lg border border-alert-neon-red"><span class="text-alert-neon-red font-bold text-xl">⚠️</span><div><h4 class="font-semibold text-lg text-alert-neon-red">Requisito de Nickname</h4><p class="text-gray-200">El jugador debe presentarse con el Nickname <span class="font-bold text-primary-accent">exactamente igual</span> al registrado en el formulario. <span class="font-extrabold underline">No es necesario el uso de siglas de escuadrón.</span> Jugar con un nick diferente se considera <span class="font-extrabold underline">automáticamente descalificado</span>.</p></div></li>
+                                    <li class="flex items-start gap-3"><span class="text-secondary-accent font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">Contacto Obligatorio Pre-Partida</h4><p class="text-gray-400">Ambos equipos rivales deben <span class="font-bold text-primary-accent">contactarse vía WhatsApp</span> al menos <span class="font-bold text-primary-accent">10 minutos antes</span> de la hora pautada de la partida para coordinar la creación de la sala.</p></div></li>
+                                    <li class="flex items-start gap-3"><span class="text-secondary-accent font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">Modo de Juego y Creación de Sala</h4><p class="text-gray-400 mb-4">Los Equipos deberán acordar entre ellos quién creará la Sala. Esta debe ser <span class="font-bold text-primary-accent">Personalizada</span>. Si uno de los Equipos es de <span class="font-bold text-secondary-accent">Venezuela</span>, tiene prioridad para crear la sala ese Equipo.<br>Si ambos o ningún Equipo es venezolano, y no llegan a un acuerdo, deberán lanzar una moneda virtual, que debe ser transmitida por videollamada mostrando la pantalla uno de ellos.</p><div class="mt-4"><a href="https://share.google/gWDlmqwOYe3EmYted" target="_blank" class="inline-flex items-center justify-center px-6 py-3 text-sm md:text-base font-bold uppercase rounded-xl btn-action-primary transition-all duration-300 transform hover:scale-105 shadow-md">LANZAR MONEDA VIRTUAL AQUÍ<svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></a></div></div></li>
+                                    <li class="flex items-start gap-3"><span class="text-gray-300 font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">Puntualidad y W.O. (Walk Over)</h4><p class="text-gray-400">Hay <span class="font-bold">10 minutos de tolerancia</span> desde la hora oficial. Si el Equipo no está presente tras 10 minutos, el rival puede pedir W.O.</p></div></li>
+                                    <li class="flex items-start gap-3"><span class="text-gray-300 font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">Prueba de W.O.</h4><p class="text-gray-400">El Equipo presente deberá documentar el W.O. tomando un <span class="font-bold">capture de pantalla</span> de la sala con los <span class="font-bold text-primary-accent">5 jugadores presentes</span> y la <span class="font-bold">hora legible</span> (mostrando que el Equipo rival no llegó a tiempo) y enviarlo a través del formulario de Carga de Resultados, tal como si hubiese ganado la partida.</p></div></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="2xl font-semibold text-primary-accent mb-3 border-b-2 border-gray-700 pb-2">Durante la Partida</h3>
+                                <ul class="list-none space-y-4">
+                                    <li class="flex items-start gap-3"><span class="text-secondary-accent font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">PROHIBIDO ESPECTADORES</h4><p class="text-gray-400">Sólo <span class="font-bold text-primary-accent">10 jugadores</span> (5 por Equipo) deben estar en la sala. No se admiten espectadores, excepto en las Semifinales y Gran Final que estará presente el STAFF de TNML para la transmisión de la Partida.</p></div></li>
+                                    <li class="flex items-start gap-3"><span class="text-secondary-accent font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">FORMATO DE JUEGO ABIERTO</h4><p class="text-gray-400">El juego se desarrolla en modo <span class="font-extrabold text-primary-accent">Clásico/Draft Pick</span> (según la ronda) 5v5. Los equipos pueden seleccionar <span class="font-extrabold text-secondary-accent">libremente</span> la composición de héroes, hechizos y emblemas que deseen. <span class="font-bold underline">No hay restricción de roles.</span></p></div></li>
+                                    <li class="flex items-start gap-3 p-3 bg-red-900/50 rounded-lg border border-alert-neon-red"><span class="text-alert-neon-red font-bold text-xl">🛑</span><div><h4 class="font-semibold text-lg text-alert-neon-red">CONDICIÓN DE VICTORIA (NEXO)</h4><p class="text-gray-400">El ganador de la partida es <span class="font-extrabold text-primary-accent">EL EQUIPO QUE TUMBE EL NEXO ENEMIGO</span>. Se puede hacer uso de todas las estrategias y mecánicas del mapa para lograr este objetivo.</p></div></li>
+                                    <li class="flex items-start gap-3"><span class="text-secondary-accent font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">Desconexiones</h4><p class="text-gray-400">Si un jugador se le cae la conexión o se desconecta, el <span class="font-bold text-primary-accent">resultado final de la partida</span> es lo que determinará de quién fué la victoria. No se reiniciará la partida por problemas de conexión.</p></div></li>
+                                    <li class="flex items-start gap-3"><span class="text-secondary-accent font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">Partidas Bo3 (Gran Final)</h4><p class="text-gray-400">Para la Gran Final, al ser al <span class="font-bold text-primary-accent">Mejor de 3 (Bo3)</span>, se jugarán hasta 3 partidas. Los Equipos deben reportar el resultado final de la serie (2-0, 2-1) y no de partidas individuales.</p></div></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="2xl font-semibold text-primary-accent mb-3 border-b-2 border-gray-700 pb-2">Después de la Partida</h3>
+                                <ul class="list-none space-y-4">
+                                    <li class="flex items-start gap-3"><span class="text-secondary-accent font-bold text-xl">►</span><div><h4 class="font-semibold text-lg">Reporte de Resultado</h4><p class="text-gray-400 mb-4">El equipo ganador deberá tomar un <span class="font-bold">capture de pantalla</span> del resultado final y enviarlo a la organización ingresando en el siguiente enlace. Para el <span class="font-bold text-secondary-accent">Bo3</span>, se debe capturar el resultado final de la serie.</p><a href="https://forms.gle/mitEBXrnLFTn3bFW8" target="_blank" id="result-upload-btn" class="inline-block px-6 py-2 text-md font-bold uppercase rounded transition-all duration-300 transform hover:scale-105 shadow-md mt-2" style="background-color: var(--secondary-accent); box-shadow: 0 0 10px var(--secondary-accent); color: var(--text-light); font-weight: 700;">CARGA LOS RESULTADOS DE TU PARTIDA AQUÍ<svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"></path></svg></a></div></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SECCIÓN 4: CONDUCTA -->
+            <div class="accordion-item" id="accordion-conducta">
+                <button data-target="conducta" class="accordion-header flex justify-between items-center w-full p-4 rounded-xl text-left font-bold text-xl transition duration-300"><span>4. CÓDIGO DE CONDUCTA</span><svg id="icon-conducta" class="w-6 h-6 icon-rotate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                <div id="content-conducta" class="accordion-content overflow-hidden transition-all duration-500 ease-in-out max-h-0">
+                    <div class="accordion-content-body p-6 md:p-8">
+                        <h2 class="text-3xl font-bold text-primary-accent mb-4">Código de Conducta</h2>
+                        <p class="text-lg text-gray-300 mb-6">El juego limpio y el respeto son la base de TNML. Incurrir en las siguientes faltas resultará en sanciones severas, que van desde la <span class="font-bold text-alert-neon-red">descalificación inmediata</span> hasta el <span class="font-bold text-tertiary-mauve-base">baneo permanente</span>, dependiendo de la gravedad de la ofensa.</p>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="stat-card grave-offense items-start p-4 lg:col-span-3" style="background-color:var(--translucent-secondary-70); border: 2px solid var(--secondary-accent); box-shadow:0 0 10px var(--secondary-accent);"><h3 class="text-xl font-bold text-tertiary-mauve-base mb-2" style="color:var(--tertiary-mauve-base);">🚨 INFRACCIÓN MUY GRAVE: Baneo Permanente</h3><p class="text-gray-400">Estas acciones conllevan la exclusión permanente de la organización TNML.</p></div>
+                            <div class="stat-card grave-offense items-start p-4"><h4 class="font-semibold text-lg text-tertiary-mauve-base">1. Irrespeto (Staff/Patrocinantes)</h4><p class="text-gray-400">Cualquier falta de respeto o maltrato (verbal, escrito o por redes) hacia los patrocinantes o miembros del Staff de la Organización TNML.</p></div>
+                            <div class="stat-card grave-offense items-start p-4"><h4 class="font-semibold text-lg text-tertiary-mauve-base">2. Programas Externos / Hacks</h4><p class="text-gray-400">Uso de <span class="italic">hacks</span>, <span class="italic">scripts</span>, <span class="italic">map hacks</span> o cualquier software de trampa.</p></div>
+                            <div class="stat-card grave-offense items-start p-4"><h4 class="font-semibold text-lg text-tertiary-mauve-base">3. Aprovechamiento de Bugs</h4><p class="text-gray-400">Usar intencionalmente <span class="italic">bugs</span> o <span class="italic">exploits</span> del juego para obtener una ventaja.</p></div>
+                            <div class="stat-card prohibido-offense items-start p-4 lg:col-span-3 mt-6"><h3 class="text-xl font-bold text-alert-neon-red mb-2">🛑 INFRACCIÓN PROHIBIDA: Descalificación Inmediata</h3><p class="text-gray-400">Estas acciones resultan en la expulsión directa del torneo en curso.</p></div>
+                            <div class="stat-card prohibido-offense items-start p-4"><h4 class="font-semibold text-lg text-alert-neon-red">1. W.O. (Walk Over)</h4><p class="text-gray-400">Si un Equipo no está listo en la sala tras <span class="font-bold">10 minutos de tolerancia</span> de la hora oficial.</p></div>
+                            <div class="stat-card prohibido-offense items-start p-4"><h4 class="font-semibold text-lg text-alert-neon-red">2. Discriminación / Xenofobia</h4><p class="text-gray-400">Actos de discriminación, xenofobia, racismo o cualquier forma de odio.</p></div>
+                            <div class="stat-card prohibido-offense items-start p-4"><h4 class="font-semibold text-lg text-alert-neon-red">3. Suplantación de Identidad</h4><p class="text-gray-400">Jugar en la cuenta de otro jugador o con un Nickname no registrado.</p></div>
+                            <div class="stat-card prohibido-offense items-start p-4 lg:col-span-3"><h4 class="font-semibold text-lg text-alert-neon-red">4. Insultos y Maltratos (Texto/Voz)</h4><p class="text-gray-400">Acoso verbal, amenazas o lenguaje excesivamente ofensivo hacia otros participantes o la comunidad, ya sea por chat o micrófono.</p></div>
+                            <div class="stat-card border-l-4 border-primary-accent items-start p-4 lg:col-span-3 mt-6"><h3 class="text-xl font-bold text-primary-accent mb-2">✅ PERMITIDO AHORA (Y SUS LÍMITES)</h3><p class="text-gray-400 mb-3"><span class="font-bold">Burla No Verbal (Emotes y Backeos):</span> Por votación, el uso de <span class="italic">emotes</span> y el <span class="italic">backeo</span> (burla) están ahora <span class="font-bold text-secondary-accent">permitidos</span> durante la partida.</p><div class="mt-2 p-3 rounded-md border-2 border-secondary-accent" style="background-color:rgba(255, 0, 255, 0.2);"><p class="font-bold text-secondary-accent">LÍMITE CRÍTICO: SOLO BURLEO NO VERBAL</p><p class="text-gray-300 text-sm">Esta permisividad <span class="font-extrabold text-alert-neon-red">NO AUTORIZA</span> los insultos, el maltrato verbal, <span class="font-extrabold text-alert-neon-red">ni las burlas escritas (texto en chat)</span>. Las burlas deben limitarse a <span class="font-bold">emotes y backeos dentro del juego</span> (como se detalla en la Falta Prohibida N° 4).</p></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- SECCIÓN 5: DISPUTAS -->
+            <div class="accordion-item" id="accordion-disputas">
+                <button data-target="disputas" class="accordion-header flex justify-between items-center w-full p-4 rounded-xl text-left font-bold text-xl transition duration-300"><span>5. DISPUTAS, DENUNCIAS Y SANCIONES</span><svg id="icon-disputas" class="w-6 h-6 icon-rotate" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button>
+                <div id="content-disputas" class="accordion-content overflow-hidden transition-all duration-500 ease-in-out max-h-0">
+                    <div class="accordion-content-body p-6 md:p-8">
+                        <h2 class="text-3xl font-bold text-primary-accent mb-4">Disputas y Sanciones</h2>
+                        <p class="text-lg text-gray-300 mb-6">Si un rival rompe las reglas o si tienes una inquietud sobre la organización, aquí te explicamos cómo proceder.</p>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-gray-900 p-6 rounded-lg border border-gray-700">
+                                <h3 class="text-2xl font-semibold text-alert-neon-red mb-3">Protocolo de Denuncia (Faltas de Rival)</h3>
+                                <p class="text-gray-300 mb-4">Usa este formulario para denunciar FALTAS DE RIVALES (Trampas, conducta tóxica, etc.).</p>
+                                <ol class="list-decimal list-inside space-y-2 text-gray-300 mb-4">
+                                    <li><span class="font-bold text-primary-accent">Equipo Afectado:</span> Sólo el <span class="font-bold text-secondary-accent">Equipo afectado</span> puede presentar una denuncia formal.</li>
+                                    <li><span class="font-bold text-primary-accent">PRUEBAS:</span> La denuncia debe incluir <span class="font-bold">pruebas irrefutables</span> (captures de pantalla, videos) que muestren la falta y quién la cometió.</li>
+                                    <li class="font-semibold text-secondary-accent">Sin pruebas claras, la denuncia será desestimada.</li>
+                                </ol>
+                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSciCjtgPFfOLh6V9u6vf-jYanlVD5LM4_FulKO9K-2U3_vouA/viewform?usp=publish-editor" target="_blank" id="denuncia-upload-btn" class="inline-block px-6 py-2 text-md font-bold uppercase rounded transition-all duration-300 transform hover:scale-105 shadow-md mt-2 denuncia-btn w-full">DENUNCIA UNA FALTA DE UN RIVAL AQUÍ<svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></a>
+                            </div>
+                            <div class="reclamo-panel p-6 rounded-lg">
+                                <h3 class="text-2xl font-semibold text-secondary-accent mb-3">Protocolo de Reclamos y Sugerencias (Organización)</h3>
+                                <p class="text-gray-300 mb-4">Utiliza este formulario EXCLUSIVO para reclamos, inquietudes o sugerencias sobre <span class="font-bold text-primary-accent">la organización, reglas o gestión</span> del torneo.</p>
+                                <div class="mt-4 p-3 bg-red-900/50 border rounded-lg mb-4" style="border-color: var(--alert-neon-red); color: var(--text-light);"><p class="font-bold text-lg text-alert-neon-red">¡ADVERTENCIA DE SABOTAJE!</p><p>Cualquier reclamo o sugerencia hecha en público (chats, redes, streams) será considerado un <span class="font-bold">intento de sabotaje a la imagen</span> de TNML. Esto resultará en un <span class="font-bold">Llamado de Atención Formal</span> y la acumulación de estos puede ser considerada una <span class="font-bold">Falta Grave</span>.</p></div>
+                                <a href="https://forms.gle/EHXMD549s4Nuc78X6" target="_blank" id="organizacion-sugerencia-btn" class="inline-block px-6 py-2 text-md font-bold uppercase rounded transition-all duration-300 transform hover:scale-105 shadow-md organizacion-btn w-full">HAZ TU RECLAMO O SUGERENCIA AQUÍ<svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.805A9.959 9.959 0 012 12C2 7.582 6.03 4 11 4s9 3.582 9 8z"></path></svg></a>
+                            </div>
+                            <div class="md:col-span-2 bg-gray-900 p-6 rounded-lg border border-gray-700 mt-6"><div class="mt-4 p-3 bg-gray-700 border border-gray-600 text-gray-200 rounded-lg"><p class="font-bold">Autoridad Final</p><p>La organización TNML tiene la decisión final e inapelable sobre todas las disputas, basándose en las pruebas presentadas.</p></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="h-24 md:h-32"></div>
+        </main>
+    </div>
+    <audio id="bg-music" loop src="https://tnmlbb.github.io/musicadetorneos/ZODIAC.mp3" preload="auto"></audio>
+    <script>
+        function getCssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+        document.addEventListener('DOMContentLoaded',()=>{
+            const calLink=document.getElementById('calendar-link');
+            if(calLink){
+                const d='20251205',t='ZODIAC TOURNAMENT SAGITARIO (¡Semis y Final Bo3 en vivo!)',det='Torneo de Mobile Legends (TNML) - Rondas de Eliminación. ¡Asegúrate de estar listo a tiempo! Nota: Se transmiten dos Semifinales (Bo1) y la Gran Final (Bo3) por TikTok.',loc='Online - Servidor de Mobile Legends Bang Bang (Transmisión en TikTok de TNML)';
+                calLink.href=`https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t)}&details=${encodeURIComponent(det)}&location=${encodeURIComponent(loc)}&dates=${d}T200000/${d}T230000&ctz=America/Caracas`;
+            }
+            const accs=document.querySelectorAll('.accordion-item');
+            accs.forEach(item=>{
+                const h=item.querySelector('.accordion-header'),c=item.querySelector('.accordion-content'),i=item.querySelector('.icon-rotate'),b=c.querySelector('.accordion-content-body'),tid=h.getAttribute('data-target');
+                if(tid!=='inicio'){c.style.maxHeight=0;h.classList.remove('active');i.classList.remove('rotated')}else{c.style.maxHeight=b.scrollHeight+'px'}
+                h.addEventListener('click',()=>{
+                    const act=h.classList.contains('active');
+                    accs.forEach(o=>{if(o!==item){o.querySelector('.accordion-header').classList.remove('active');o.querySelector('.icon-rotate').classList.remove('rotated');o.querySelector('.accordion-content').style.maxHeight=0}});
+                    if(act){h.classList.remove('active');i.classList.remove('rotated');c.style.maxHeight=0}else{h.classList.add('active');i.classList.add('rotated');c.style.maxHeight=b.scrollHeight+'px'}
+                    setTimeout(()=>item.scrollIntoView({behavior:'smooth',block:'start'}),500)
+                });
+                new MutationObserver(()=>{if(h.classList.contains('active'))c.style.maxHeight=b.scrollHeight+'px'}).observe(b,{childList:true,subtree:true,characterData:true});
+            });
+            const ctx=document.getElementById('bracketChart');
+            if(ctx){
+                // Usando un azul más claro para el borde del gráfico (el Deep Blue es muy oscuro para contraste)
+                const sc=getCssVar('--secondary-accent'),pc='rgba(0, 0, 179, 1)',gc='rgba(148, 163, 189, 0.6)';
+                new Chart(ctx,{type:'bar',data:{labels:['Primera Ronda (Bo1)','Cuartos (Bo1)','Semifinal (Bo1)','Gran Final (Bo3)','Campeón'],datasets:[{label:'Equipos Restantes',data:[16,8,4,2,1],backgroundColor:[gc,'rgba(100, 116, 139, 0.6)','rgba(71, 85, 105, 0.6)',pc,pc],borderColor:[gc,'rgba(100, 116, 139, 1)','rgba(71, 85, 105, 1)','rgba(66, 135, 245, 1)','rgba(66, 135, 245, 1)'],borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{stepSize:2,color:'#e2e8f0'},grid:{color:'rgba(71, 85, 105, 0.5)'},title:{display:true,text:'Número de Equipos',color:sc}},x:{ticks:{color:'#e2e8f0'},grid:{color:'rgba(71, 85, 105, 0.5)'},title:{display:true,text:'Rondas del Torneo',color:sc}}}}});
+            }
+            const mBtn=document.getElementById('music-toggle-btn'),bgMusic=document.getElementById('bg-music');
+            bgMusic.volume=.5;let isPlay=true;
+            const updBtn=()=>{mBtn.classList.toggle('off',!isPlay);mBtn.innerHTML=isPlay?`<svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464l-4.243 4.243 1.06 1.06 4.243-4.243 1.06-1.06zM9 19L5 15H1v-6h4l4-4v10z"></path></svg> MÚSICA ON`:`<svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.757 1.757l20.5 20.5M6 9H2v6h4l6 6V3L6 9z"></path></svg> MÚSICA OFF`};
+            bgMusic.play().catch(()=>{console.warn("Autoplay bloqueado");isPlay=false;updBtn()});
+            mBtn.addEventListener('click',()=>{isPlay=!isPlay;isPlay?bgMusic.play().catch(()=>{isPlay=false}):bgMusic.pause();updBtn()});
+            updBtn();
+        });
+    </script>
+</body>
+</html>
