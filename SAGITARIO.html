@@ -9,11 +9,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         
-        /* --- QUINTA PALETA DE COLORES (DEEP BLUE/MAGENTA - Basada en el Logo) --- */
+        /* --- SEXTA PALETA DE COLORES (PALE BLUE/MAGENTA) --- */
         :root{
-            /* Base: Deep Blue-Black #0D0D1A | Primary: Deep Electric Blue #0000B3 | Secondary: Vibrant Magenta #FF00FF */
+            /* Base: Deep Blue-Black #0D0D1A | Primary: Pale Cyan #D5ECF8 | Secondary: Vibrant Magenta #FF00FF */
             
-            --primary-accent: #0000B3;  /* Deep Electric Blue (Usado para texto, bordes, elementos principales) */
+            --primary-accent: #D5ECF8;  /* Pale Cyan (Usado para texto, bordes, elementos principales) */
             --secondary-accent: #FF00FF; /* Vibrant Magenta (Usado para bloques, botones de acción, foco) */
             --base-dark: #0D0D1A;        /* Deep Blue-Black (Fondo de base) */
             
@@ -27,7 +27,7 @@
             --translucent-dark-50: rgba(13, 13, 26, 0.8); 
             --translucent-dark-70: rgba(13, 13, 26, 0.95); /* Más opaco para legibilidad sobre el video */
             --translucent-secondary-70: rgba(255, 0, 255, 0.2); /* Tinte magenta suave */
-            --translucent-primary-70: rgba(0, 0, 179, 0.3); /* Tinte deep blue suave (basado en #0000B3) */
+            --translucent-primary-70: rgba(213, 236, 248, 0.2); /* Tinte pale cyan suave (basado en #D5ECF8) */
         }
 
         #video-background{position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:hidden;z-index:-100;pointer-events:none;}
@@ -47,12 +47,12 @@
         /* Ajuste de botones: Cyan/Magenta tienen diferentes textos */
         .accordion-header{background-color:var(--secondary-accent);color:var(--text-light); text-shadow: 0 1px 2px rgba(0,0,0,0.5); box-shadow:0 4px 6px -1px rgba(0,0,0,.6);border:2px solid var(--secondary-accent);transition:all 0.3s ease; font-weight: 700;}
         .accordion-header:hover{filter:brightness(1.1);}
-        /* El acordeón activo usa el Primary Accent (Deep Blue) */
-        .accordion-header.active{background-color:var(--primary-accent);color:var(--text-light);text-shadow: 0 1px 2px rgba(0,0,0,0.5);border-bottom-left-radius:0;border-bottom-right-radius:0;border-color:var(--primary-accent);}
+        /* El acordeón activo usa el Primary Accent (Pale Cyan) -> Texto Oscuro para contraste */
+        .accordion-header.active{background-color:var(--primary-accent);color:var(--base-dark);text-shadow:none;border-bottom-left-radius:0;border-bottom-right-radius:0;border-color:var(--primary-accent);}
         .accordion-content-body{background-color:var(--translucent-dark-70);border:1px solid var(--primary-accent);border-top:none;border-bottom-left-radius:0.75rem;border-bottom-right-radius:0.75rem;}
         
         .icon-rotate{transition:transform 0.3s ease;} .icon-rotate.rotated{transform:rotate(180deg);}
-        .stat-card{background-color:var(--translucent-dark-50);border-radius:.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.6),0 4px 6px -2px rgba(0,0,0,.4);padding:1.5rem;display:flex;flex-direction:column;justify-content:center;align-items:center; border: 1px solid rgba(0, 0, 179, 0.2);}
+        .stat-card{background-color:var(--translucent-dark-50);border-radius:.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.6),0 4px 6px -2px rgba(0,0,0,.4);padding:1.5rem;display:flex;flex-direction:column;justify-content:center;align-items:center; border: 1px solid rgba(213, 236, 248, 0.3);}
         
         .bg-gray-800,.bg-gray-900{background-color:var(--translucent-dark-50)!important;}
         .chart-container{position:relative;width:100%;max-width:600px;margin-left:auto;margin-right:auto;height:300px;max-height:400px;}
@@ -68,8 +68,8 @@
         .denuncia-btn{background-color:var(--alert-neon-red);color:var(--text-light);box-shadow:0 0 10px var(--alert-neon-red);transition:all .3s ease;font-weight:700;}
         .denuncia-btn:hover{box-shadow:0 0 20px var(--alert-neon-red);transform:scale(1.05);background-color:#ff3333;}
         
-        /* Botones Principales (Deep Blue - Texto Light) */
-        .btn-action-primary{background-color:var(--primary-accent);box-shadow:0 0 15px var(--primary-accent);color:var(--text-light);text-shadow: 0 1px 2px rgba(0,0,0,0.5);transition:all .3s ease;transform:scale(1.0); font-weight: 700;}
+        /* Botones Principales (Pale Cyan - Texto Dark para contraste) */
+        .btn-action-primary{background-color:var(--primary-accent);box-shadow:0 0 15px var(--primary-accent);color:var(--base-dark);text-shadow:none;transition:all .3s ease;transform:scale(1.0); font-weight: 700;}
         .btn-action-primary:hover{box-shadow:0 0 25px var(--primary-accent),0 0 3px var(--text-light);transform:scale(1.05);}
         
         /* Botones Secundarios (Vibrant Magenta - Texto Light) */
@@ -87,10 +87,11 @@
         .music-btn.off{background-color:var(--alert-neon-red);color:var(--text-light);box-shadow:0 0 10px var(--alert-neon-red);}
         .music-btn:hover{filter:brightness(1.2);}
         
-        .calendar-btn{background-color:var(--primary-accent);color:var(--text-light);box-shadow:0 0 10px var(--primary-accent);transition:all .3s ease;font-weight:700;}
+        /* Calendario Btn - Fondo claro, texto oscuro */
+        .calendar-btn{background-color:var(--primary-accent);color:var(--base-dark);box-shadow:0 0 10px var(--primary-accent);transition:all .3s ease;font-weight:700;}
         .calendar-btn:hover{box-shadow:0 0 20px var(--primary-accent),0 0 5px var(--text-light);transform:scale(1.03);}
         
-        .mandatory-alert{background-color:rgba(0, 0, 179, 0.2);border:2px solid var(--primary-accent);color:var(--text-light);padding:1.25rem;border-radius:.5rem;text-align:center;box-shadow:0 0 15px rgba(0, 0, 179, 0.5);}
+        .mandatory-alert{background-color:rgba(213, 236, 248, 0.2);border:2px solid var(--primary-accent);color:var(--text-light);padding:1.25rem;border-radius:.5rem;text-align:center;box-shadow:0 0 15px rgba(213, 236, 248, 0.5);}
         .mandatory-alert strong{font-size:1.5rem;display:block;margin-bottom:.5rem;} .mandatory-alert p{font-size:1.125rem;font-weight:600;}
         
         .tiktok-live-alert{background-color:var(--translucent-secondary-70);border:2px solid var(--secondary-accent);color:var(--text-light);padding:1.5rem;border-radius:1rem;text-align:center;box-shadow:0 0 20px rgba(255, 0, 255, 0.4);animation:pulse-border 1.5s infinite alternate;}
@@ -99,11 +100,12 @@
         
         .grave-offense{background-color:var(--translucent-secondary-70);border:2px solid var(--secondary-accent);box-shadow:0 0 10px var(--secondary-accent);}
         
-        .organizacion-btn{background-color:var(--primary-accent);color:var(--text-light);box-shadow:0 0 15px var(--primary-accent);transition:all 0.3s ease;font-weight:700;}
+        /* Organizacion Btn - Fondo claro, texto oscuro */
+        .organizacion-btn{background-color:var(--primary-accent);color:var(--base-dark);box-shadow:0 0 15px var(--primary-accent);transition:all 0.3s ease;font-weight:700;}
         .organizacion-btn:hover{box-shadow:0 0 25px var(--primary-accent),0 0 5px var(--text-light);transform:scale(1.05);}
         
         .reclamo-panel{background-color:var(--translucent-secondary-70);border-radius:.75rem;padding:1.5rem;margin-top:1.5rem;box-shadow:0 10px 15px -3px rgba(0,0,0,.6);border:1px solid var(--secondary-accent);}
-        .info-panel{background-color:var(--translucent-primary-70);border:2px solid var(--primary-accent);padding:1.5rem;border-radius:.75rem;box-shadow:0 0 10px rgba(0, 0, 179, 0.3);margin-top:1.5rem;}
+        .info-panel{background-color:var(--translucent-primary-70);border:2px solid var(--primary-accent);padding:1.5rem;border-radius:.75rem;box-shadow:0 0 10px rgba(213, 236, 248, 0.4);margin-top:1.5rem;}
         .prohibido-offense{background-color:rgba(255, 79, 79, 0.2);border:2px solid var(--alert-neon-red);box-shadow:0 0 10px var(--alert-neon-red);}
         
         /* Ajustes para textos específicos */
@@ -180,7 +182,7 @@
                         <div class="tiktok-live-alert mt-8 mb-10">
                             <strong class="flex items-center justify-center">¡SEMIFINALES Y GRAN FINAL EN VIVO!</strong>
                             <p class="text-xl font-semibold text-gray-200 mb-4">Transmitiremos <span class="font-extrabold text-primary-accent">dos partidos de Semifinal (Bo1)</span> y el enfrentamiento definitivo <span class="font-extrabold text-alert-neon-red">(Gran Final Bo3)</span> en nuestra cuenta oficial de TikTok.</p>
-                            <a href="https://www.tiktok.com/@torneosnocturnos?_t=ZM-90xkaWgv1YW&_r=1" target="_blank" class="inline-flex items-center justify-center px-8 py-3 text-lg font-bold uppercase rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl" style="background-color: var(--primary-accent); color: var(--text-light); box-shadow: 0 0 15px var(--primary-accent);">VER LA TRANSMISIÓN EN TIKTOK</a>
+                            <a href="https://www.tiktok.com/@torneosnocturnos?_t=ZM-90xkaWgv1YW&_r=1" target="_blank" class="inline-flex items-center justify-center px-8 py-3 text-lg font-bold uppercase rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl" style="background-color: var(--primary-accent); color: var(--base-dark); box-shadow: 0 0 15px var(--primary-accent);">VER LA TRANSMISIÓN EN TIKTOK</a>
                         </div>
                         <h3 class="2xl font-bold text-primary-accent mb-4 border-t pt-4 border-gray-700">Progresión del Torneo</h3>
                         <p class="text-gray-300 mb-4">El torneo se desarrollará en un único día con formato de eliminación simple (Bo1, excepto la Gran Final que es Bo3). La gráfica a continuación muestra cómo avanzarán los 16 Equipos hasta encontrar al Equipo Campeón.</p>
@@ -356,7 +358,7 @@
             const ctx=document.getElementById('bracketChart');
             if(ctx){
                 // Usando un azul más claro para el borde del gráfico (el Deep Blue es muy oscuro para contraste)
-                const sc=getCssVar('--secondary-accent'),pc='rgba(0, 0, 179, 1)',gc='rgba(148, 163, 189, 0.6)';
+                const sc=getCssVar('--secondary-accent'),pc='rgba(213, 236, 248, 1)',gc='rgba(148, 163, 189, 0.6)';
                 new Chart(ctx,{type:'bar',data:{labels:['Primera Ronda (Bo1)','Cuartos (Bo1)','Semifinal (Bo1)','Gran Final (Bo3)','Campeón'],datasets:[{label:'Equipos Restantes',data:[16,8,4,2,1],backgroundColor:[gc,'rgba(100, 116, 139, 0.6)','rgba(71, 85, 105, 0.6)',pc,pc],borderColor:[gc,'rgba(100, 116, 139, 1)','rgba(71, 85, 105, 1)','rgba(66, 135, 245, 1)','rgba(66, 135, 245, 1)'],borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,ticks:{stepSize:2,color:'#e2e8f0'},grid:{color:'rgba(71, 85, 105, 0.5)'},title:{display:true,text:'Número de Equipos',color:sc}},x:{ticks:{color:'#e2e8f0'},grid:{color:'rgba(71, 85, 105, 0.5)'},title:{display:true,text:'Rondas del Torneo',color:sc}}}}});
             }
             const mBtn=document.getElementById('music-toggle-btn'),bgMusic=document.getElementById('bg-music');
